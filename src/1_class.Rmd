@@ -12,7 +12,9 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# install.packages("tidyverse", type = "source")
+# install.packages("tidyverse")
+# install.packages("readr")
+# install.packages("dplyr")
 
 ```{r Lib_packages}
 
@@ -29,7 +31,7 @@ library(magrittr)
 
 ```{r Weather_War}
 
-df <- read_csv('data/Summary_of_Weather.csv')
+df <- read_csv('C:/Users/viniciushc/Desktop/Class_R/R/data/Summary_of_Weather.csv')
 
 ```
 
@@ -99,6 +101,8 @@ df %<>%
 df %>% 
   summarise(
     MO = MO,
+    
+    
     Precip = mean(Precip)
   ) %>% 
   filter(Precip > 10)
