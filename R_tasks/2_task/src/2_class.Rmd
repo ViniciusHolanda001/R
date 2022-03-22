@@ -1,0 +1,165 @@
+---
+title: "Telecom_churn"
+date: 2022-03-22
+author:
+  - name: Vinicius Holanda Cavalcante
+    affiliation: UNINOVE
+    affiliation_url: https://www.uninove.br
+output: html_document
+---
+
+# install.packages('skimr')
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r Libraries}
+
+library(readr)
+library(tibble)
+library(dplyr)
+library(stringr)
+library(tidyr)
+library(magrittr)
+library(plotly)
+library(ggplot2)
+library(tidyverse)
+library(skimr)
+
+```
+
+
+
+```{r Telecom_churn_dataset}
+
+
+df <- read.csv("data\telecom_churn.csv")
+
+```
+## The normal plot :: just to see the difference
+
+```{r normal_plot}
+
+plot(df)
+plot(df$Total.day.calls, df$Total.day.charge, color = as.factor(df$State))
+
+```
+
+
+
+```{r Transform_Variables}
+
+df %<>% 
+  rename_with(~ tolower(gsub('.', '_', .x, fixed = TRUE)))
+
+
+sum(is.na(df))
+
+
+df %>% 
+  count(churn)
+
+
+df %>% 
+  group_by(state, churn) %>% 
+  summarise(
+    mean_calls_day = mean(total_day_calls),
+    mean_charge_day = mean(total_day_charge)
+  )
+
+skimr::skim(df)
+
+df
+
+```
+
+
+```{r Calls and charge per day by churn}
+
+plot_calls <- df %>%   
+  ggplot(aes(total_day_calls, total_day_charge, colour = as.factor(churn))) +
+  geom_point() +
+  # geom_smooth(method = 'lm') +
+  labs(
+    title = 'Total of calls and Charge per day',
+    subtitle = 'By client',
+    colour = 'Churn',
+    y = 'Charge',
+    x = 'Calls'
+  )
+
+plot_calls
+
+```
+
+
+```{r}
+
+plot_hist <- df %>% 
+  ggplot(aes(state, fill = churn)) +
+  geom_bar() +
+  # geom_smooth(method = 'lm') +
+  labs(
+    title = 'Total of churn',
+    subtitle = 'By state',
+    fill = 'Churn',
+    y = 'Clients',
+    x = 'State'
+    
+  )
+
+plot_hist
+
+```
+
+```{r}
+
+plot_fun <- df %>% 
+  ggplot(aes(y=fct_reorder(state, total_day_minutes), color=churn)) +
+  geom_bar()
+
+plot_fun
+
+
+```
+
+```{r}
+
+
+plot_lin <- df %>% 
+  ggplot(aes(total_day_minutes, state, colour = churn)) +
+  geom_line()
+
+plot_lin
+
+```
+
+```{r}
+
+plot_histogram <- df %>% 
+  ggplot(aes(x = total_day_calls, y = total_night_calls, color = state)) +
+  geom_point()
+  facet_wrap(~ churn)
+
+plot_histogram
+
+```
+
+
+```{r}
+
+
+plot_hist_stat <- df %>% 
+  ggplot(aes(total_day_charge)) +
+  geom_histogram(aes(y = stat(count)/sum(count)), bins = 10) +
+  facet_wrap(~ international_plan)
+
+plot_hist_stat
+
+
+```
+
+
+
